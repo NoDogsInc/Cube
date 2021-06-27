@@ -87,7 +87,7 @@ class RpcPostProcessor : PostProcessor {
         clientProperty = GetPropertyDefinitionByName(replicaBehaviourType, "client");
         replicaManagerProperty = GetPropertyDefinitionByName(replicaBehaviourType, "ReplicaManager");
 
-        var cubeClientType = GetTypeDefinitionByName(replicationAssembly, "Cube.Replication.ICubeClient");
+        var cubeClientType = GetTypeDefinitionByName(replicationAssembly, "Cube.Replication.Client");
         networkInterfaceProperty = GetPropertyDefinitionByName(cubeClientType, "networkInterface");
 
         var ireplicaManager = GetTypeDefinitionByName(replicationAssembly, "Cube.Replication.IReplicaManager");

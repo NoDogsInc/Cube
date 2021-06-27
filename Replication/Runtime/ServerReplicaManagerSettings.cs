@@ -4,19 +4,18 @@ using UnityEngine;
 namespace Cube.Replication {
     [Serializable]
     public class ServerReplicaManagerSettings {
+        [Header("Connections")]
         [Range(0, 1500)]
-        public int MaxBytesPerConnectionPerUpdate = 1400;
+        public int MaxBytesPerUpdate = 1400;
+
+        [Header("Replicas")]
         [Range(1000f / 60f, 1000f / 1f)]
-        public float ReplicaUpdateRateMS = 33; // 30 times per second
-        public float ReplicaUpdateRate {
-            get { return ReplicaUpdateRateMS * 0.001f; }
-        }
+        public float UpdateRateMS = 33; // 30 times per second
+        public float UpdateRate => UpdateRateMS * 0.001f;
 
         [Range(1000f / 60f, 1000f / 0.1f)]
-        public float ReplicaRelevantSetUpdateRateMS = 1000;
-        public float ReplicaRelevantSetUpdateRate {
-            get { return ReplicaRelevantSetUpdateRateMS * 0.001f; }
-        }
+        public float RelevantSetUpdateRateMS = 1000;
+        public float RelevantSetUpdateRate => RelevantSetUpdateRateMS * 0.001f;
 
         [Tooltip("Replicas below this relevance in relation to the ReplicaView will not be considered for replication")]
         [Range(0f, 1f)]

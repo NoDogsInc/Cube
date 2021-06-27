@@ -8,7 +8,7 @@ namespace Cube.Replication {
     [AddComponentMenu("Cube/ReplicaView")]
     public class ReplicaView : MonoBehaviour {
         [HideInInspector]
-        public Connection Connection;
+        public Connection Connection = Connection.Invalid;
 
         /// <summary>
         /// Ignore Replica positions when calculating relevancy. F.i. RTS game.

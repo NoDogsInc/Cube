@@ -15,7 +15,11 @@ namespace Cube.Replication {
 
         public static ReplicaSettings defaultReplicaSettings;
         public ReplicaSettings settings;
-        public ReplicaSettings settingsOrDefault => settings != null ? settings : defaultReplicaSettings;
+        public ReplicaSettings settingsOrDefault {
+            get {
+                return settings != null ? settings : defaultReplicaSettings;
+            }
+        }
 
         public bool replicateOnlyToOwner;
 
@@ -29,8 +33,8 @@ namespace Cube.Replication {
 
         public bool isSceneReplica => sceneIdx != 0;
 
-        public ICubeServer server;
-        public ICubeClient client;
+        public Server server;
+        public Client client;
         public IReplicaManager ReplicaManager => server != null ? (IReplicaManager)server.ReplicaManager : client.replicaManager;
 
         public bool isServer => server != null;

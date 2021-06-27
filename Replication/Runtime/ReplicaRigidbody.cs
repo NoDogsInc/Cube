@@ -2,10 +2,10 @@
 using BitStream = Cube.Transport.BitStream;
 
 namespace Cube.Replication {
-    /// <summary>
-    /// Synced Rigidbody based on state synchronization.
-    /// </summary>
-    /// <remarks>Available in: Editor/Client/Server</remarks>
+    /// Network-synced Rigidbody.
+    /// Simulates the Rigidbody fully on the client, with instant state correction when we receive the update-to-date
+    /// server state. We do this in order to improve client-side simulation and prediction.
+    /// In order to smooth out what the player sees we seperate the visible model from the actual simulation.
     [AddComponentMenu("Cube/ReplicaRigidbody")]
     [RequireComponent(typeof(Rigidbody))]
     public class ReplicaRigidbody : ReplicaBehaviour {
@@ -20,6 +20,7 @@ namespace Cube.Replication {
         Vector3 currentModelPosition;
         Quaternion currentModelRotation;
         float blend;
+
 
         void Awake() {
             rigidbody = GetComponent<Rigidbody>();
@@ -61,9 +62,9 @@ namespace Cube.Replication {
                 return;
 
             var velocity = rigidbody.velocity;
-            bs.WriteLossyFloat(velocity.x, -maxVelocity, maxVelocity);
-            bs.WriteLossyFloat(velocity.y, -maxVelocity, maxVelocity);
-            bs.WriteLossyFloat(velocity.z, -maxVelocity, maxVelocity);
+            bs.WriteLossyFloat(velocity.x, -maxVelocity, maxVelocity, 0.5f);
+            bs.WriteLossyFloat(velocity.y, -maxVelocity, maxVelocity, 0.5f);
+            bs.WriteLossyFloat(velocity.z, -maxVelocity, maxVelocity, 0.5f);
 
             var angularVelocity = rigidbody.angularVelocity;
             bs.WriteLossyFloat(angularVelocity.x, -maxAngularVelocity, maxAngularVelocity);
@@ -86,9 +87,9 @@ namespace Cube.Replication {
             var sleeping = bs.ReadBool();
             if (!sleeping) {
                 velocity = new Vector3 {
-                    x = bs.ReadLossyFloat(-maxVelocity, maxVelocity),
-                    y = bs.ReadLossyFloat(-maxVelocity, maxVelocity),
-                    z = bs.ReadLossyFloat(-maxVelocity, maxVelocity)
+                    x = bs.ReadLossyFloat(-maxVelocity, maxVelocity, 0.5f),
+                    y = bs.ReadLossyFloat(-maxVelocity, maxVelocity, 0.5f),
+                    z = bs.ReadLossyFloat(-maxVelocity, maxVelocity, 0.5f)
                 };
                 angularVelocity = new Vector3 {
                     x = bs.ReadLossyFloat(-maxAngularVelocity, maxAngularVelocity),

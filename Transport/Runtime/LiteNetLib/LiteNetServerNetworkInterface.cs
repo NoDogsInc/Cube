@@ -25,11 +25,11 @@ namespace Cube.Transport {
             server.Start(port);
         }
 
-        public void BroadcastBitStream(BitStream bs, PacketReliability reliablity, int sequenceChannel = 0) {
+        public void BroadcastBitStream(BitStream bs, PacketPriority priority, PacketReliability reliablity, int sequenceChannel = 0) {
             server.SendToAll(bs.Data, 0, bs.Length, (byte)sequenceChannel, GetDeliveryMethod(reliablity));
         }
 
-        public void SendBitStream(BitStream bs, PacketReliability reliablity, Connection connection, int sequenceChannel = 0) {
+        public void SendBitStream(BitStream bs, PacketPriority priority, PacketReliability reliablity, Connection connection, int sequenceChannel = 0) {
             var peer = server.GetPeerById((int)connection.id);
             peer.Send(bs.Data, 0, bs.Length, (byte)sequenceChannel, GetDeliveryMethod(reliablity));
         }
@@ -50,14 +50,16 @@ namespace Cube.Transport {
                 f /= 1024; // b -> kb
                 var f2 = Mathf.RoundToInt(f * 100) * 0.01f;
 
-                TransportDebugger.ReportStatistic($"out {server.Statistics.PacketsSent} {f2}k/s");
+                TransportDebugger.ReportStatistic($"out {server.Statistics.PacketsSent / Time.time:0.00}msgs/s");
+                TransportDebugger.ReportStatistic($"out {f2:0.00}kb/s");
             }
             {
                 var f = server.Statistics.BytesReceived / Time.time;
                 f /= 1024; // b -> kb
                 var f2 = Mathf.RoundToInt(f * 100) * 0.01f;
 
-                TransportDebugger.ReportStatistic($"in {server.Statistics.PacketsSent} {f2}k/s");
+                TransportDebugger.ReportStatistic($"in {server.Statistics.PacketsSent / Time.time:0.00}msgs/s");
+                TransportDebugger.ReportStatistic($"in {f2:0.00}kb/s");
             }
 #endif
         }
@@ -91,6 +93,11 @@ namespace Cube.Transport {
         }
 
         public void OnConnectionRequest(ConnectionRequest request) {
+            if (ApproveConnection == null) {
+                request.Accept();
+                return;
+            }
+
             var bs = BitStream.CreateWithExistingBuffer(request.Data.RawData,
                 request.Data.UserDataOffset * 8,
                 request.Data.RawDataSize * 8);

@@ -17,7 +17,7 @@ namespace Cube.Replication {
 
         const ushort FirstLocalReplicaId = 255; // The first 255 values are reserved for scene Replicas
 
-        readonly ICubeServer server;
+        readonly Server server;
         readonly NetworkScene networkScene;
         public ReadOnlyCollection<Replica> Replicas {
             get => networkScene.Replicas;
@@ -40,7 +40,7 @@ namespace Cube.Replication {
         Dictionary<ReplicaId, Replica> replicasInConstruction = new Dictionary<ReplicaId, Replica>();
         List<Replica> replicasInDestruction = new List<Replica>();
 
-        public ServerReplicaManager(ICubeServer server, ServerReplicaManagerSettings settings) {
+        public ServerReplicaManager(Server server, ServerReplicaManagerSettings settings) {
             Assert.IsNotNull(server);
             Assert.IsNotNull(settings);
 
@@ -214,14 +214,14 @@ namespace Cube.Replication {
                     continue;
 
                 if (Time.timeAsDouble >= replicaView.NextPriorityUpdateTime) {
-                    replicaView.NextPriorityUpdateTime = Time.timeAsDouble + settings.ReplicaRelevantSetUpdateRate;
+                    replicaView.NextPriorityUpdateTime = Time.timeAsDouble + settings.RelevantSetUpdateRate;
                     UpdateRelevantReplicas(replicaView);
                 }
             }
 
             // Network tick
             if (Time.timeAsDouble >= nextUpdateTime) {
-                nextUpdateTime = Time.timeAsDouble + settings.ReplicaUpdateRate;
+                nextUpdateTime = Time.timeAsDouble + settings.UpdateRate;
 
                 for (int i = 0; i < replicaViews.Count; ++i) {
                     var replicaView = replicaViews[i];
@@ -365,7 +365,7 @@ namespace Cube.Replication {
                 view.RelevantReplicaPriorityAccumulator[currentReplicaIdx] = 0;
 
                 bytesSent += updateBs.Length;
-                if (bytesSent >= settings.MaxBytesPerConnectionPerUpdate)
+                if (bytesSent >= settings.MaxBytesPerUpdate)
                     return; // Packet size exhausted
 
                 // Rpcs
@@ -389,7 +389,7 @@ namespace Cube.Replication {
 #endif
 
                     bytesSent += queuedRpc.bs.Length;
-                    if (bytesSent >= settings.MaxBytesPerConnectionPerUpdate)
+                    if (bytesSent >= settings.MaxBytesPerUpdate)
                         return; // Packet size exhausted
                 }
             }
@@ -453,7 +453,7 @@ namespace Cube.Replication {
                 var relevance = replica.GetRelevance(view);
                 Assert.IsTrue(relevance >= 0 && relevance <= 1);
 
-                var a = (settings.ReplicaUpdateRateMS / replica.settings.DesiredUpdateRateMS) * (relevance * relevance);
+                var a = (settings.UpdateRateMS / replica.settings.DesiredUpdateRateMS) * (relevance * relevance);
                 view.RelevantReplicaPriorityAccumulator[i] += a;
             }
         }

@@ -134,9 +134,7 @@ namespace Cube.Transport {
             }
         }
 
-        public void SendBitStream(BitStream bs, PacketReliability reliablity, Connection connection, int sequenceChannel) {
-            Debug.Log("<< " + reliablity + " " + bs.ReadByte() + " len=" + bs.Length + " " + bs);
-
+        public void SendBitStream(BitStream bs, PacketPriority priority, PacketReliability reliablity, Connection connection, int sequenceChannel) {
             Assert.IsTrue(connection != Connection.Invalid);
 
             var msg = server.CreateMessage(bs.Length);
@@ -147,9 +145,7 @@ namespace Cube.Transport {
             server.SendMessage(msg, netConnection, GetReliability(reliablity), sequenceChannel);
         }
 
-        public void BroadcastBitStream(BitStream bs, PacketReliability reliablity, int sequenceChannel) {
-            Debug.Log("<< " + reliablity + " " + bs.ReadByte() + " len=" + bs.Length + " " + bs);
-
+        public void BroadcastBitStream(BitStream bs, PacketPriority priority, PacketReliability reliablity, int sequenceChannel) {
             if (server.Connections.Count == 0)
                 return;
 
@@ -166,6 +162,7 @@ namespace Cube.Transport {
                 if ((ulong)con.RemoteUniqueIdentifier == connection.id)
                     return con;
             }
+            Debug.Log(connection.id);
             throw new ConnectionNotFoundException();
         }
 

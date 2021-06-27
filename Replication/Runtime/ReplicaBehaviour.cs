@@ -5,7 +5,7 @@ using BitStream = Cube.Transport.BitStream;
 namespace Cube.Replication {
     public abstract class ReplicaBehaviour : MonoBehaviour {
         public struct SerializeContext {
-            public ReplicaView View;
+            public ReplicaView Observer;
         }
 
         [HideInInspector]
@@ -16,8 +16,8 @@ namespace Cube.Replication {
 
         public static Connection rpcConnection = Connection.Invalid;
 
-        public ICubeServer server => Replica.server;
-        public ICubeClient client => Replica.client;
+        public Server server => Replica.server;
+        public Client client => Replica.client;
         public IReplicaManager ReplicaManager => Replica.ReplicaManager;
 
         public bool isServer => Replica.isServer;

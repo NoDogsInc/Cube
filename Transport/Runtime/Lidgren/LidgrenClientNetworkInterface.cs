@@ -66,7 +66,7 @@ namespace Cube.Transport {
             client.Shutdown("bye byte"); //#TODO message ?
         }
 
-        public void Send(BitStream bs, PacketReliability reliablity) {
+        public void Send(BitStream bs, PacketPriority priority, PacketReliability reliablity) {
             var msg = client.CreateMessage(bs.Length);
             msg.Write(bs.Data, 0, bs.Length);
             msg.LengthBits = bs.LengthInBits;
@@ -74,7 +74,7 @@ namespace Cube.Transport {
         }
 
         void ReceiveMessages() {
-            while(true) {
+            while (true) {
                 var msg = client.ReadMessage();
                 if (msg == null)
                     break;
@@ -102,7 +102,6 @@ namespace Cube.Transport {
                             var p = bs.Position;
                             var id = bs.ReadByte();
                             bs.Position = p;
-                            Debug.Log(">> " + msg.DeliveryMethod + " " + id + " len=" + bs.Length + " " + bs);
 
                             ReceivedPacket(bs);
                             break;

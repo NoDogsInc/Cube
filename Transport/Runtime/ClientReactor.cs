@@ -6,10 +6,17 @@ namespace Cube.Transport {
     public delegate void ClientMessageHandler(BitStream bs);
 
     public class ClientReactor {
-        readonly Dictionary<byte, List<ClientMessageHandler>> handlers;
+        IClientNetworkInterface _networkInterface;
+        public IClientNetworkInterface networkInterface {
+            get { return _networkInterface; }
+        }
+
+        Dictionary<byte, List<ClientMessageHandler>> _handlers;
 
         public ClientReactor(IClientNetworkInterface networkInterface) {
-            handlers = new Dictionary<byte, List<ClientMessageHandler>>();
+            _handlers = new Dictionary<byte, List<ClientMessageHandler>>();
+
+            _networkInterface = networkInterface;
 
             networkInterface.ReceivedPacket += OnReceivedPacket;
         }
@@ -18,7 +25,7 @@ namespace Cube.Transport {
             var messageId = bs.ReadByte();
 
             List<ClientMessageHandler> handlers;
-            if (!handlers.TryGetValue(messageId, out handlers) || handlers.Count == 0) {
+            if (!_handlers.TryGetValue(messageId, out handlers) || handlers.Count == 0) {
                 Debug.LogWarning("[Client] Received unknown packet " + messageId);
                 return;
             }
@@ -28,7 +35,8 @@ namespace Cube.Transport {
 
                 try {
                     handler(bs);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     Debug.LogException(e);
                 }
 
@@ -38,9 +46,9 @@ namespace Cube.Transport {
 
         public void AddHandler(byte id, ClientMessageHandler handler) {
             List<ClientMessageHandler> existingHandlers;
-            if (!handlers.TryGetValue(id, out existingHandlers)) {
+            if (!_handlers.TryGetValue(id, out existingHandlers)) {
                 existingHandlers = new List<ClientMessageHandler>();
-                handlers.Add(id, existingHandlers);
+                _handlers.Add(id, existingHandlers);
             }
 
             existingHandlers.Add(handler);
@@ -48,7 +56,7 @@ namespace Cube.Transport {
 
         public void RemoveHandler(byte id, ClientMessageHandler handler) {
             List<ClientMessageHandler> existingHandlers;
-            if (!handlers.TryGetValue(id, out existingHandlers))
+            if (!_handlers.TryGetValue(id, out existingHandlers))
                 return;
 
             existingHandlers.Remove(handler);

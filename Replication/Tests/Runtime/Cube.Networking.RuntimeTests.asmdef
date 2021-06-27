@@ -2,14 +2,15 @@
     "name": "Cube.Networking.RuntimeTests",
     "rootNamespace": "",
     "references": [
-        "Cube.Networking",
         "Cube.Replication",
         "Cube.Transport",
         "Cube.Transport.RuntimeTests",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": true,

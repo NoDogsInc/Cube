@@ -12,14 +12,14 @@ namespace Cube.Replication {
         public static List<ClientReplicaManager> All = new List<ClientReplicaManager>();
 #endif
 
-        ICubeClient client;
+        Client client;
 
         NetworkScene networkScene;
         NetworkPrefabLookup networkPrefabLookup;
 
         float nextUpdateTime;
 
-        public ClientReplicaManager(ICubeClient client, NetworkPrefabLookup networkPrefabLookup) {
+        public ClientReplicaManager(Client client, NetworkPrefabLookup networkPrefabLookup) {
             Assert.IsNotNull(networkPrefabLookup);
 
             this.networkPrefabLookup = networkPrefabLookup;
